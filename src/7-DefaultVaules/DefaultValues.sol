@@ -79,5 +79,6 @@ contract ForAndWhileLoops {
 /////////////////////////////////
 
 // There are 3 ways to declare an error:
+// 
 
 contract Error {}
