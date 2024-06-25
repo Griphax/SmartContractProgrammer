@@ -66,7 +66,7 @@ contract ForAndWhileLoops {
 
     // ITS IMPORTANT TO CONSIDER THAT THE MORE LOOPS WE ASSIGN THE MORE GAS EXPENSIVE IT WILL GET, SO ITS IMPORTANT TO LIMIT THE LOOPS AS MUCH AS WE CAN.
     function sum(uint256 _n) external pure returns (uint256) {
-        uint256 s;
+        uint256 s; //
         for (uint256 i = 1; i <= _n; i++) {
             s += i;
         }
@@ -79,6 +79,100 @@ contract ForAndWhileLoops {
 /////////////////////////////////
 
 // There are 3 ways to declare an error:
-// 
+// require, revert, assert
+// gas refund, state updates are reverted
+// custom error - save gas
 
-contract Error {}
+contract Error {
+    // REQUIRE
+    function testRequire(uint256 _i) public pure {
+        require(_i <= 10, "Value must be greater than 10");
+    }
+
+    // REVERT
+    function testRevert(uint256 _i) public pure {
+        if (_i <= 10) {
+            revert("Value must be greater than 10");
+        }
+    }
+
+    // ASSERT
+    uint256 public num = 123;
+
+    function testAssert() public view {
+        assert(num == 123);
+    }
+
+    function foo(uint256 _i) public {
+        // HERE WE ACCIDENTALLY INCREMENT THE NUM VARIABLE
+        // SO THE ASSERT FUNCTION WILL FAIL(that is above)
+        // AND THE TRANSACTION WILL BE REVERTED
+        num += 1;
+        // WE CAN USE REQUIRE INSIDE THE FUNCTION TO MAKE SURE THE VALUE IS LESS THAN 10
+        require(_i < 10);
+    }
+
+    // CUSTOM ERROR
+
+    error myError(address caller, uint256 i);
+
+    function testCustomError(uint256 _i) public view {
+        if (_i > 10) {
+            revert myError(msg.sender, _i);
+        }
+    }
+}
+
+contract FunctionModifier {
+    bool public paused;
+    uint256 public count;
+
+    // Modifier to check if not paused
+    modifier whenNotPaused() {
+        require(!paused, "paused");
+        // Underscore is a special character only used inside
+        // a function modifier and it tells Solidity to
+        // execute the rest of the code.
+        _;
+    }
+
+    modifier whenPaused() {
+        require(paused, "not paused");
+        _;
+    }
+
+    function reset() external whenPaused {
+        count = 0;
+    }
+
+    function setPause(bool _paused) external {
+        paused = _paused;
+    }
+
+    // This function will throw an error if paused
+    function inc() external whenNotPaused {
+        count += 1;
+    }
+
+    function dec() external whenNotPaused {
+        count -= 1;
+    }
+
+    // Modifiers can take inputs.
+    // Here is an example to check that x is < 10
+    modifier cap(uint256 x) {
+        require(x < 10, "x >= 10");
+        _;
+    }
+
+    function incBy(uint256 x) external whenNotPaused cap(x) {
+        count += x;
+    }
+
+    // Modifiers can execute code before and after the function.
+    modifier sandwich() {
+        // code here
+        _;
+        // more code here
+    }
+}
