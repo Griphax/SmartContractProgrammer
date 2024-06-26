@@ -123,6 +123,10 @@ contract Error {
     }
 }
 
+////////////////////////////////////////
+/////////// MODIFIERS ///////////
+//////////////////////////////////////
+
 contract FunctionModifier {
     bool public paused;
     uint256 public count;
@@ -175,4 +179,15 @@ contract FunctionModifier {
         _;
         // more code here
     }
+}
+
+////////////////////////////////////////////
+/////////// CONSTRUCTOR /////////
+///////////////////////////////////////////
+
+contract Constructor {
+    address public owner;
+    uint256 public x;
+
+    constructor(uint256 _x) {}
 }
